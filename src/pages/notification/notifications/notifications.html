@@ -1,0 +1,39 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Centi</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher (ionRefresh)="listNotifications($event)">
+        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Puxe para atualizar" refreshingSpinner="circles" refreshingText="Atualizando...">
+        </ion-refresher-content>
+    </ion-refresher>
+    <ion-list>
+        <button ion-item [navPush]="readyContentPage">
+            <ion-avatar item-left>
+                <img src="https://placehold.it/350x350">
+            </ion-avatar>
+            <h2>Leitura</h2>
+            <p>Esta é uma notificação do tipo somente Leitura</p>
+        </button>
+        <button ion-item (click)="openConfirmation()">
+            <ion-avatar item-left>
+                <img src="https://placehold.it/350x350">
+            </ion-avatar>
+            <h2>Confirmação</h2>
+            <p>Esta é uma notificação do tipo Confirmação</p>
+        </button>
+        <button ion-item (click)="openForm(n)">
+            <ion-avatar item-left>
+                <img src="https://placehold.it/350x350">
+            </ion-avatar>
+            <h2>Formulário</h2>
+            <p>Esta é uma notificação do tipo Formulário</p>
+        </button>
+    </ion-list>
+
+</ion-content>

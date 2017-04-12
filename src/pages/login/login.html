@@ -1,0 +1,30 @@
+<ion-content [attr.noScroll]="shouldScroll">
+    <div class="content-logo">
+        <div> <img src="assets/logo/logo-centi.png" alt=""> </div>
+    </div>
+    <form [formGroup]="loginForm">
+
+        <ion-item>
+            <ion-label stacked>Usuário</ion-label>
+            <ion-input type="text" formControlName="user" [(ngModel)]="usuario.User"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="!loginForm.controls.user.valid  && (loginForm.controls.user.dirty || submitAttempt)">
+            <p style="color: red">Por favor preencha o login</p>
+        </ion-item>
+        <ion-item>
+            <ion-label stacked>Senha</ion-label>
+            <ion-input type="password" formControlName="password" [(ngModel)]="usuario.Pass"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="!loginForm.controls.password.valid  && (loginForm.controls.password.dirty || submitAttempt)">
+            <p style="color: red">Por favor preencha a senha</p>
+        </ion-item>
+        <ion-grid>
+            <ion-row class="content-padding">
+                <button ion-button full class="btn-login" (click)="login()">Login</button>
+            </ion-row>
+            <ion-row class="content-center">
+                <button ion-button clear (click)="openModalLostPassoword()">Esqueceu a senha? </button>
+            </ion-row>
+        </ion-grid>
+    </form>
+</ion-content>

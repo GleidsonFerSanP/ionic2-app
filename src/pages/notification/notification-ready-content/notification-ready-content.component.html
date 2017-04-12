@@ -1,0 +1,27 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Centi</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher (ionRefresh)="listNotifications($event)">
+        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Puxe para atualizar" refreshingSpinner="circles" refreshingText="Atualizando...">
+        </ion-refresher-content>
+    </ion-refresher>
+    <ion-card>
+        <ion-card-header>
+            Titulo
+        </ion-card-header>
+        <ion-card-content>
+            <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia officia eaque nemo eos ut, delectus qui dolores architecto doloribus ratione aut eveniet ad sed, assumenda voluptate officiis sit voluptatum necessitatibus.</div>
+            <div>Odit, sit quidem suscipit, quod at repellendus nostrum autem esse voluptatem ducimus nemo cupiditate mollitia repudiandae placeat vero corrupti quasi quos ut aperiam laudantium iste non sequi aliquid omnis nesciunt!</div>
+            <div>Deserunt fugit animi, consequuntur, quaerat error magnam atque! Sit debitis optio commodi soluta quasi magnam molestias deserunt provident, quo assumenda officia natus, voluptatibus inventore eum blanditiis tempora iure consequuntur omnis!</div>
+            <div>Ex, ratione dolore, impedit tempora temporibus fuga consectetur laboriosam ad commodi sit libero at velit quibusdam. Delectus animi eum molestias officiis. Fuga enim dicta pariatur, et ex temporibus voluptatem impedit.</div>
+            <div>Dicta quibusdam, ut officiis sed, aliquam obcaecati recusandae quisquam placeat. Tenetur doloribus quis aperiam, quos ex eveniet aliquam officiis iure magni vero expedita consectetur asperiores aliquid voluptas necessitatibus harum sed.</div>
+        </ion-card-content>
+    </ion-card>
+</ion-content>
