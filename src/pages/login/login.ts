@@ -3,6 +3,8 @@ import { NavController, Platform } from 'ionic-angular';
 import { Toast } from '@ionic-native/toast';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { LoadingController } from 'ionic-angular';
+
 import { NotificationsPage } from './../notification/notifications/notifications';
 
 import { AuthService } from './../../providers/auth-service';
@@ -11,7 +13,8 @@ import { Usuario } from './../../model/usuario';
 import { Device } from './../../model/device';
 import { CentiResponseObject } from './../../model/centi-response-object';
 
-import { StorageUtils } from './../../providers/storage-utils';
+import { Unconnected } from '../pages/unconnected/unconnected';
+import { Serverdown } from '../pages/serverdown/serverdown';
 
 @Component({
   selector: 'page-login',
@@ -22,6 +25,9 @@ export class LoginPage {
   loginForm: FormGroup;
   usuario: Usuario = new Usuario();
   submitAttempt: boolean = false;
+  loader = this.loading.create({
+    content: 'Um momento por favor...',
+  });
 
   constructor(
     public navCtrl: NavController,
@@ -29,7 +35,7 @@ export class LoginPage {
     private platform: Platform,
     public formBuilder: FormBuilder,
     private auth: AuthService,
-    private storage: StorageUtils) {
+    public loading: LoadingController) {
 
     this.loginForm = this.formBuilder.group({
       user: ['', Validators.required],
@@ -45,46 +51,37 @@ export class LoginPage {
       return;
     }
 
-    this.storage.setItem("teste", { id: 1 });
-
     this.submitAttempt = true;
 
-    this.auth.login(this.usuario)
-      .subscribe((response) => {
-        this.filterResponse(response)
-      }, (error) => {
-        console.log(error);
-        this.requestErrors(error);
-      });
+    this.loader.present().then(() => {
+      this.auth.login(this.usuario)
+        .subscribe((response) => {
+          window.localStorage.setItem('User', this.usuario.User);
+          this.filterResponse(response)
+        }, (error) => {
+          console.log(error);
+          this.requestErrors(error);
+          this.loader.dismiss();
+        });
+    });
   }
 
   private filterResponse(response) {
 
     var data: CentiResponseObject = response.json();
     if (data.Success) {
-      this.storage.setItem('SessionId', data.Value);
-      this.storage.getItem("pushToken")
-        .then((arg) => {
 
-          let deviceId: string = arg.toString();
-          let device = new Device(deviceId, data.Value, this.usuario.User);
-          this.auth.registerDevice(device)
-            .subscribe((res) => {
-              var data1: CentiResponseObject = res.json();
-              if (data1.Success)
-                this.navCtrl.setRoot(NotificationsPage);
-            }, (error) => console.log(error));
-        }
-      );
+      window.localStorage.setItem('SessionId', data.Value);
+      this.registerDeviceOnPushNotification(data.Value);
 
     }
     else {
       this.message(data.Message.join("\n"));
-      this.storage.setItem('SessionId', null);
+      window.localStorage.setItem('SessionId', '');
     }
   }
 
-  requestErrors(error) {
+  private requestErrors(error) {
 
     switch (error.status) {
       case 404:
@@ -98,6 +95,34 @@ export class LoginPage {
       default:
         break;
     }
+  }
+
+  private registerDeviceOnPushNotification(SessionId: string) {
+
+    if (!this.platform.is("mobile")){
+      this.navCtrl.setRoot(NotificationsPage);
+      this.loader.dismiss();
+    }
+
+    let deviceId: string = window.localStorage.getItem('pushToken');
+    let device = new Device(deviceId, SessionId, this.usuario.User);
+    this.sendRegister(device);
+  }
+
+  private sendRegister(device: Device) {
+    if (!device.DeviceId) {
+      this.loader.dismiss();
+      return;
+    }
+
+    this.auth.registerDevice(device)
+      .subscribe((res) => {
+        var data: CentiResponseObject = res.json();
+        this.loader.dismiss();
+        if (data.Success)
+          this.navCtrl.setRoot(NotificationsPage);
+
+      }, (error) => console.log(error));
   }
 
   message(text: string) {

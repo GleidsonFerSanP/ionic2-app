@@ -13,27 +13,27 @@
         </ion-refresher-content>
     </ion-refresher>
     <ion-list>
-        <button ion-item [navPush]="readyContentPage">
+        <button ion-item (click)="openPageContentNotification()" *ngFor="let notification of notifications">
             <ion-avatar item-left>
                 <img src="https://placehold.it/350x350">
             </ion-avatar>
             <h2>Leitura</h2>
             <p>Esta é uma notificação do tipo somente Leitura</p>
         </button>
-        <button ion-item (click)="openConfirmation()">
+        <!--<button ion-item (click)="openPageContentNotification()">
             <ion-avatar item-left>
                 <img src="https://placehold.it/350x350">
             </ion-avatar>
             <h2>Confirmação</h2>
             <p>Esta é uma notificação do tipo Confirmação</p>
         </button>
-        <button ion-item (click)="openForm(n)">
+        <button ion-item (click)="openPageContentNotification()">
             <ion-avatar item-left>
                 <img src="https://placehold.it/350x350">
             </ion-avatar>
             <h2>Formulário</h2>
             <p>Esta é uma notificação do tipo Formulário</p>
-        </button>
+        </button>-->
     </ion-list>
 
 </ion-content>

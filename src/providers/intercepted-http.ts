@@ -3,9 +3,10 @@ import { ConnectionBackend, RequestOptions, Request, RequestOptionsArgs, Respons
 import { Observable } from "rxjs/Rx";
 import { environment } from "./environment";
 
+
 @Injectable()
 export class InterceptedHttp extends Http {
-  
+
   constructor(backend: ConnectionBackend, defaultOptions: RequestOptions) {
     super(backend, defaultOptions);
   }
@@ -44,6 +45,11 @@ export class InterceptedHttp extends Http {
     if (options.headers == null)
       options.headers = new Headers();
     options.headers.append('Content-Type', 'application/json');
+
+    let SessionId = window.localStorage.getItem('SessionId');
+
+    if (SessionId)
+      options.headers.append('SessionId', SessionId);
 
     return options;
   }
