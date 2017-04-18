@@ -8,12 +8,14 @@ import { Push, PushObject, PushOptions } from '@ionic-native/push';
 import { AuthService } from './../providers/auth-service';
 import { PushNotificationDao } from './../providers/push-notification-dao';
 
+import { Network } from '@ionic-native/network';
+
 import { Usuario } from './../model/usuario';
 import { PushNotification } from './../model/push-notification';
-import { CentiResponseObject } from './../model/centi-response-object';
 
 import { NotificationsPage } from '../pages/notification/notifications/notifications';
-import { LoginPage } from '../pages/login/login';
+import { LoginPage } from '../pages/auth/login/login';
+import { Unconnected } from '../pages/unconnected/unconnected';
 
 @Component({
   templateUrl: 'app.html'
@@ -30,7 +32,8 @@ export class MyApp {
     public splashScreen: SplashScreen,
     private auth: AuthService,
     private push: Push,
-    private pushNotificationDAO: PushNotificationDao) {
+    private pushNotificationDAO: PushNotificationDao,
+    private network: Network) {
 
     this.initializeApp();
 
@@ -46,13 +49,16 @@ export class MyApp {
         this.usuario.User = User;
       }
 
-      if (SessionId)
+      if(!navigator.onLine)
+        this.rootPage = Unconnected;
+      else if (SessionId)
         this.rootPage = NotificationsPage;
       else
         this.rootPage = LoginPage;
 
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.listenerConnection();
       this.initializeListenerNotification();
 
     });
@@ -61,8 +67,7 @@ export class MyApp {
   initializeListenerNotification() {
     const options: PushOptions = {
       android: {
-        senderID: '146802623313',
-        //forceShow: true
+        senderID: '1002983514235'
       },
       ios: {
         alert: 'true',
@@ -83,10 +88,10 @@ export class MyApp {
     pushObject.on('notification').subscribe((data: any) => {
       console.log('message', data);
 
-      this.savePushNotificate(data.message);
+      this.savePushNotificate(data.additionalData.tag);
 
       if (data.additionalData.foreground) {
-
+        console.log('message', data);
       } else {
         this.nav.setRoot(NotificationsPage, { notification: data.message });
       }
@@ -95,16 +100,16 @@ export class MyApp {
     pushObject.on('error').subscribe(error => console.error('Error with Push plugin', error));
   }
 
-  private savePushNotificate(pushJson: string){
-    console.log(pushJson);
-    let push: PushNotification = JSON.parse(pushJson);
+  private savePushNotificate(push: PushNotification) {
+    console.log(push);
+
     push.Read = 0;
 
     this.pushNotificationDAO.save(push)
-    .then((data)=> {
-      console.info('Push salva com sucesso: ');
-      console.info(data);
-    }, (error)=>console.log(error));
+      .then((data) => {
+        console.info('Push salva com sucesso: ');
+        console.info(data);
+      }, (error) => console.log(error));
 
   }
 
@@ -126,14 +131,40 @@ export class MyApp {
     if (!this.usuario)
       return;
 
-    this.auth.unregisterDevice(this.usuario)
-      .subscribe((response) => {
-        var data: CentiResponseObject = response.json();
-        console.log(data);
-      });
+    this.auth.unregisterDevice(this.usuario, (data) => {
+      console.log(data);
+    });
   }
 
   openPage(page) {
     this.nav.setRoot(page.component);
   }
+
+  listenerConnection() {
+    this.network.onDisconnect().subscribe(() => {
+      console.log('network was disconnected :-(');
+      this.nav.setRoot(Unconnected);
+    });
+
+    this.network.onConnect().subscribe(() => {
+      console.log('network connected!');
+      let page;
+      let SessionId = window.localStorage.getItem('SessionId');
+      let User = window.localStorage.getItem('User');
+
+      if (User) {
+        this.usuario.User = User;
+      }
+
+      if (SessionId)
+        page = NotificationsPage;
+      else
+        page = LoginPage;
+
+      this.nav.setRoot(page);
+
+    });
+  }
 }
+
+

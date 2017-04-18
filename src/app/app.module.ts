@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
-import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler, IonicModule, NavModule } from 'ionic-angular';
 
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
 
@@ -14,7 +14,6 @@ import { Toast } from '@ionic-native/toast';
 
 import { MyApp } from './app.component';
 
-import { NativeStorage } from '@ionic-native/native-storage';
 import { StorageUtils } from './../providers/storage-utils';
 
 import { AuthService } from '../providers/auth-service';
@@ -23,12 +22,14 @@ import { PushNotificationDao } from '../providers/push-notification-dao';
 
 import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 import { Geolocation } from '@ionic-native/geolocation';
+import { Network } from '@ionic-native/network';
+import { Diagnostic } from '@ionic-native/diagnostic';
 
 import { Unconnected } from '../pages/unconnected/unconnected';
 import { Serverdown } from '../pages/serverdown/serverdown';
 
-import { NotificationPageModule } from './../pages/notification/notification.module'
-import { LoginPageModule } from './../pages/login/login.module'
+import { NotificationPageModule } from './../pages/notification/notification.module';
+import { AuthModule } from './../pages/auth/auth.module';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -43,8 +44,9 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   imports: [
     BrowserModule,
     NotificationPageModule,
-    LoginPageModule,
+    AuthModule,
     HttpModule,
+    NavModule,
     IonicModule.forRoot(MyApp),
   ],
   bootstrap: [IonicApp],
@@ -56,12 +58,13 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   providers: [
     SQLite,
     PushNotificationDao,
-    NativeStorage,
     Toast,
     BackgroundGeolocation,
     Push,
     Geolocation,
     AuthService,
+    Network,
+    Diagnostic,
     StorageUtils,
     StatusBar,
     SplashScreen,

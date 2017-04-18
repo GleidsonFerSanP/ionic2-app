@@ -13,7 +13,7 @@ import { PushNotificationDao } from './../../../providers/push-notification-dao'
   selector: 'page-notificacoes',
   templateUrl: 'notifications.html'
 })
-export class NotificationsPage implements OnInit{
+export class NotificationsPage implements OnInit {
 
   readyContentPage = NotificationReadyContentComponent;
   notifications: Array<PushNotification> = [];
@@ -28,31 +28,60 @@ export class NotificationsPage implements OnInit{
 
   }
 
-  ngOnInit(){
-      if(this.platform.is('mobile'))
-      this.listAll(); 
+  ngOnInit() {
+    this.platform.ready().then(() => {
+      if (this.platform.is('android') || this.platform.is('ios')) {
+        this.listAllOnInit();
+      }
+    })
   }
 
+  private listAllOnInit() {
+    this.notifications = [];
+    this.dao.findAllOnInit((data) => {
+
+      console.log(data);
+
+      if (data.rows.length > 0) {
+        for (var i = 0; i < data.rows.length; i++) {
+          let push = new PushNotification();
+          let obj = data.rows.item(i);
+          push.Id = obj.Id;
+          push.Type = obj.Type;
+          push.Title = obj.Title;
+          push.Message = obj.Message;
+          push.Read = obj.READ;
+          this.notifications.push(push);
+        }
+      }
+
+      console.log(this.notifications);
+    })
+  }
   private listAll() {
+    this.notifications = [];
     this.dao.findAll()
       .then((data) => {
         if (data.rows.length > 0) {
           for (var i = 0; i < data.rows.length; i++) {
             let push = new PushNotification();
-            push.Id = data.rows.item(i);
-            push.Type = data.rows.item(i);
-            push.Title = data.rows.item(i);
-            push.Message = data.rows.item(i);
-            push.Read = data.rows.item(i);
+            let obj = data.rows.item(i);
+            push.Id = obj.Id;
+            push.Type = obj.Type;
+            push.Title = obj.Title;
+            push.Message = obj.Message;
+            push.Read = obj.READ;
             this.notifications.push(push);
           }
+
+          console.log(this.notifications);
         }
       })
   }
 
   listNotifications(refresher) {
-      this.listAll();
-      refresher.complete();
+    this.listAll();
+    refresher.complete();
   }
 
   openForm(notification) {

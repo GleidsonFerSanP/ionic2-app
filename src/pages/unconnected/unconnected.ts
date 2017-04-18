@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, Platform } from 'ionic-angular';
+import { Diagnostic } from '@ionic-native/diagnostic';
 
 @Component({
   selector: 'page-unconnected',
@@ -7,11 +8,33 @@ import { NavController, NavParams } from 'ionic-angular';
 })
 export class Unconnected {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private platform: Platform,
+    private diagnostic: Diagnostic) {
+
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad Unconnected');
+  atualizar() {
+    if (this.diagnostic.switchToWifiSettings) {
+      this.diagnostic.switchToWifiSettings();
+    } else {
+      this.diagnostic.switchToSettings();
+    }
+  }
+
+  private showSettings() {
+
+    this.platform.ready().then(() => {
+
+      if (this.diagnostic.switchToWifiSettings) {
+        this.diagnostic.switchToWifiSettings();
+      } else {
+        this.diagnostic.switchToSettings();
+      }
+
+    })
   }
 
 }

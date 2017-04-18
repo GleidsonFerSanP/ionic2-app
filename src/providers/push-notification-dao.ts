@@ -72,11 +72,28 @@ export class PushNotificationDao {
 
     return array.join('');
   }
- 
+
   public findById(id: string): Promise<Object>{
     return this.db.executeSql('SELECT * FROM pushNotification AS p WHERE p.Id = \''+id+'\'', []);
   }
-  
+
+  public findAllOnInit(callback){
+    this.platform.ready().then(() => {
+      this.sqlite.create({
+        name: "centi.db",
+        location: "default"
+      }).then((db) => {
+        this.db = db;
+        this.db.executeSql('SELECT * FROM pushNotification', [])
+        .then((data)=>{
+          callback(data);
+        })
+      }, (error) => {
+        console.error("Unable to open database", error);
+      });
+    });
+  }
+
   public findAll(){
     return this.db.executeSql('SELECT * FROM pushNotification', []);
   }
