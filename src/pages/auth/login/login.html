@@ -8,7 +8,7 @@
             <ion-input type="text" formControlName="user" [(ngModel)]="usuario.User"></ion-input>
         </ion-item>
         <ion-item *ngIf="!loginForm.controls.user.valid  && (loginForm.controls.user.dirty || submitAttempt)">
-            <p style="color: red">Por favor preencha o login</p>
+            <p style="color: red">Por favor preencha seu usuário</p>
         </ion-item>
         <ion-item>
             <ion-label stacked>Senha</ion-label>

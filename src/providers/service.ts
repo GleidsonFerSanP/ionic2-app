@@ -4,6 +4,8 @@ import { Http } from "@angular/http";
 
 import { LoadingController } from 'ionic-angular';
 
+import { CentiResponseObject } from './../model/centi-response-object';
+
 export abstract class Service {
     protected loader;
     constructor(
@@ -11,10 +13,7 @@ export abstract class Service {
         protected toast: Toast,
         protected app: App,
         protected platform: Platform,
-        protected loading: LoadingController
-    ) {
-
-    }
+        protected loading: LoadingController) {}
 
     private load() {
         this.loader = this.loading.create({
@@ -50,6 +49,11 @@ export abstract class Service {
                     this.requestErrors(error);
                 });
         });
+    }
+
+    protected generateMessages(objResponse: CentiResponseObject) {
+        let message = objResponse.Message.join("\n");
+        this.message(message);
     }
 
     private requestErrors(error) {

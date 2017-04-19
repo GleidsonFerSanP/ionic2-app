@@ -68,9 +68,4 @@ export class AuthService extends Service {
 
         this.generateMessages(obj);
     }
-
-    private generateMessages(objResponse: CentiResponseObject) {
-        let message = objResponse.Message.join("\n");
-        this.message(message);
-    }
 }

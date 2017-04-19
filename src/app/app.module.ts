@@ -17,6 +17,7 @@ import { MyApp } from './app.component';
 import { StorageUtils } from './../providers/storage-utils';
 
 import { AuthService } from '../providers/auth-service';
+import { NotificationService} from '../providers/notification-service';
 
 import { PushNotificationDao } from '../providers/push-notification-dao';
 
@@ -63,6 +64,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     Push,
     Geolocation,
     AuthService,
+    NotificationService,
     Network,
     Diagnostic,
     StorageUtils,

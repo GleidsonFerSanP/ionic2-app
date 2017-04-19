@@ -1,0 +1,35 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Centi</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content>
+    <ion-refresher (ionRefresh)="listNotifications($event)">
+        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Puxe para atualizar" refreshingSpinner="circles" refreshingText="Atualizando...">
+        </ion-refresher-content>
+    </ion-refresher>
+    <ion-card>
+        <ion-card-header>
+            {{notification.Title}}
+        </ion-card-header>
+        <ion-card-content>
+            <ion-grid>
+                <ion-row>
+                    <ion-col col-12>
+                        {{notification.Message}}
+                    </ion-col>
+                </ion-row>
+                <ion-row>
+                    <ion-col col-12 style="text-align: right;" *ngIf="notification.Type === 1">
+                        <button ion-button color="danger" round (click)="no()">Não</button>
+                        <button ion-button color="secondary" round (click)="yes()">Sim</button>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-card-content>
+    </ion-card>
+</ion-content>

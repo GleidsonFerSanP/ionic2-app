@@ -13,27 +13,16 @@
         </ion-refresher-content>
     </ion-refresher>
     <ion-list>
-        <button ion-item (click)="openPageContentNotification()" *ngFor="let notification of notifications">
+        <button [ngClass]="notification.Read === 'false' || notification.Read === false ? 'item-list-new':''" ion-item (click)="openPageContentNotification(notification)" *ngFor="let notification of notifications">
             <ion-avatar item-left>
-                <img src="https://placehold.it/350x350">
+                <div class="avatar">
+                    <ion-icon *ngIf="notification.Type === 1" class="icon" md="md-help-circle" item-left></ion-icon>
+                    <ion-icon *ngIf="notification.Type === 0" class="icon" md="md-information-circle" item-left></ion-icon>
+                </div>
             </ion-avatar>
             <h2>{{notification.Title}}</h2>
             <p>{{notification.Message}}</p>
         </button>
-        <!--<button ion-item (click)="openPageContentNotification()">
-            <ion-avatar item-left>
-                <img src="https://placehold.it/350x350">
-            </ion-avatar>
-            <h2>Confirmação</h2>
-            <p>Esta é uma notificação do tipo Confirmação</p>
-        </button>
-        <button ion-item (click)="openPageContentNotification()">
-            <ion-avatar item-left>
-                <img src="https://placehold.it/350x350">
-            </ion-avatar>
-            <h2>Formulário</h2>
-            <p>Esta é uma notificação do tipo Formulário</p>
-        </button>-->
     </ion-list>
 
 </ion-content>

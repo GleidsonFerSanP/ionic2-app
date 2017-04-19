@@ -1,1 +1,24 @@
-page-notificacoes {}
+page-notificacoes {
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #E7E7E7;
+        font-size: 34px;
+    }
+    .icon {
+        margin: 0 auto;
+        padding-top: 6px;
+        display: block;
+        text-align: center;
+        border-radius: inherit;
+        opacity: 0.6;
+        margin-left: 8px !important;
+    }
+    .item-list-new {
+        font-weight: 600;
+        h2 {
+            font-weight: 900;
+        }
+    }
+}

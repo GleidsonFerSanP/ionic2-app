@@ -39,15 +39,21 @@ export class PushNotificationDao {
     })
   }
 
-  public save(pushNotification: PushNotification): Promise<Object>{
+  public save(pushNotification: PushNotification): Promise<Object> {
     let sql = this.getSaveSql(pushNotification);
     console.log(sql);
     return this.db.executeSql(sql, []);
   }
 
-  private getSaveSql(pushNotification: PushNotification): string{
+  public update(pushNotification: PushNotification): Promise<Object> {
+    let sql = this.getUpdateSql(pushNotification);
+    console.log(sql);
+    return this.db.executeSql(sql, []);
+  }
+
+  private getSaveSql(pushNotification: PushNotification): string {
     let array = [];
-    array.push("INSERT INTO pushNotification (Id, Type, Title, Message, Read) VALUES");
+    array.push("INSERT INTO pushNotification (Id, Type, Title, Message, Read, Create) VALUES");
     array.push("(");
     array.push("'");
     array.push(pushNotification.Id);
@@ -68,16 +74,47 @@ export class PushNotificationDao {
     array.push("'");
     array.push(pushNotification.Read);
     array.push("'");
+    array.push(",");
+    array.push("'");
+    array.push(this.generateSqlToDate(pushNotification.Create));
+    array.push("'");
     array.push(")");
 
     return array.join('');
   }
 
-  public findById(id: string): Promise<Object>{
-    return this.db.executeSql('SELECT * FROM pushNotification AS p WHERE p.Id = \''+id+'\'', []);
+  private generateSqlToDate(date: Date){
+      let year = date.getFullYear();
+      let month = date.getMonth();
+      let day = date.getDay();
+      let hour = date.getHours();
+      let minuts = date.getMinutes();
+      let seconds = date.getSeconds();
+
+      return `${year}-${month}-${day} ${hour}:${minuts}:${seconds}`;
   }
 
-  public findAllOnInit(callback){
+  private getUpdateSql(pushNotification: PushNotification): string {
+    let array = [];
+    array.push("UPDATE pushNotification SET ");
+    array.push("Read=");
+    array.push("'");
+    array.push(pushNotification.Read);
+    array.push("'");
+    array.push(" WHERE ");
+    array.push("Id=");
+    array.push("'");
+    array.push(pushNotification.Id);
+    array.push("'");
+
+    return array.join('');
+  }
+
+  public findById(id: string): Promise<Object> {
+    return this.db.executeSql('SELECT * FROM pushNotification AS p WHERE p.Id = \'' + id + '\'', []);
+  }
+
+  public findAllOnInit(callback) {
     this.platform.ready().then(() => {
       this.sqlite.create({
         name: "centi.db",
@@ -85,16 +122,16 @@ export class PushNotificationDao {
       }).then((db) => {
         this.db = db;
         this.db.executeSql('SELECT * FROM pushNotification', [])
-        .then((data)=>{
-          callback(data);
-        })
+          .then((data) => {
+            callback(data);
+          })
       }, (error) => {
         console.error("Unable to open database", error);
       });
     });
   }
 
-  public findAll(){
+  public findAll() {
     return this.db.executeSql('SELECT * FROM pushNotification', []);
   }
 
@@ -107,7 +144,8 @@ export class PushNotificationDao {
       ' Type INTEGER(11),',
       ' Title TEXT,',
       ' Message TEXT,',
-      ' READ INTEGER(1)',
+      ' READ INTEGER(1),',
+      ' Create DATE',
       ') '
     ].join("");
   }

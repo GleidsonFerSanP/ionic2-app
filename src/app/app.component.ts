@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Nav, Platform } from 'ionic-angular';
+import { Nav, Platform, Events } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -33,7 +33,8 @@ export class MyApp {
     private auth: AuthService,
     private push: Push,
     private pushNotificationDAO: PushNotificationDao,
-    private network: Network) {
+    private network: Network,
+    public events: Events) {
 
     this.initializeApp();
 
@@ -103,12 +104,14 @@ export class MyApp {
   private savePushNotificate(push: PushNotification) {
     console.log(push);
 
-    push.Read = 0;
+    push.Read = false;
+    push.Create = new Date();
 
     this.pushNotificationDAO.save(push)
       .then((data) => {
         console.info('Push salva com sucesso: ');
         console.info(data);
+        this.events.publish('notification:created', {}, Date.now());
       }, (error) => console.log(error));
 
   }

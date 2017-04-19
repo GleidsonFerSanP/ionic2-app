@@ -4,13 +4,13 @@ import { IonicPageModule } from 'ionic-angular';
 
 import { NotificationsPage } from './notifications/notifications';
 import { NotificationFormModal } from './form/notification-form.modal.component';
-import { NotificationReadyContentComponent } from './notification-ready-content/notification-ready-content.component'
+import { NotificationModalComponent } from './notification/notification-modal.component'
 
 @NgModule({
     declarations: [
         NotificationsPage,
         NotificationFormModal,
-        NotificationReadyContentComponent
+        NotificationModalComponent
     ],
     imports: [
         IonicPageModule.forChild(NotificationsPage)
@@ -18,7 +18,7 @@ import { NotificationReadyContentComponent } from './notification-ready-content/
     entryComponents: [
         NotificationsPage,
         NotificationFormModal,
-        NotificationReadyContentComponent
+        NotificationModalComponent
     ],
     exports:[NotificationsPage]
 })
