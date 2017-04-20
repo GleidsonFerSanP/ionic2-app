@@ -3,4 +3,8 @@ page-login {
         height: 50px;
         border-radius: 5px;
     }
+    .item-list-input-content {
+        width: calc(100% - 8px);
+        padding-left: 8px;
+    }
 }

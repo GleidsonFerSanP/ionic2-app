@@ -36,7 +36,8 @@ export class InterceptedHttp extends Http {
   }
 
   private updateUrl(req: string) {
-    return environment.origin + req;
+    let cidade = (environment.cidade === null || environment.cidade === '' || environment.cidade === undefined) ? window.localStorage.getItem("cidade"): environment.cidade;
+    return environment.origin+cidade+environment.path+req;
   }
 
   private getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {

@@ -32,6 +32,7 @@ export class PushNotificationDao {
   }
 
   private createTableIfNotExists() {
+    console.log(this.getSqlCreateDb());
     this.db.executeSql(this.getSqlCreateDb(), {}).then((data) => {
       console.log("TABLE CREATED: ", data);
     }, (error) => {
@@ -45,69 +46,62 @@ export class PushNotificationDao {
     return this.db.executeSql(sql, []);
   }
 
-  public update(pushNotification: PushNotification): Promise<Object> {
-    let sql = this.getUpdateSql(pushNotification);
-    console.log(sql);
-    return this.db.executeSql(sql, []);
+  public update(pushNotification: PushNotification, callback) {
+
+     this.platform.ready().then(() => {
+      this.sqlite.create({
+        name: "centi.db",
+        location: "default"
+      }).then((db) => {
+        this.db = db;
+        let sql = this.getUpdateSql(pushNotification);
+        console.log(sql);
+        this.db.executeSql(sql, [])
+          .then((data) => {
+            console.log(data);
+            callback(data);
+          })
+      }, (error) => {
+        console.error("Unable to open database", error);
+      });
+    });
   }
 
   private getSaveSql(pushNotification: PushNotification): string {
-    let array = [];
-    array.push("INSERT INTO pushNotification (Id, Type, Title, Message, Read, Create) VALUES");
-    array.push("(");
-    array.push("'");
-    array.push(pushNotification.Id);
-    array.push("'");
-    array.push(",");
-    array.push("'");
-    array.push(pushNotification.Type);
-    array.push("'");
-    array.push(",");
-    array.push("'");
-    array.push(pushNotification.Title);
-    array.push("'");
-    array.push(",");
-    array.push("'");
-    array.push(pushNotification.Message);
-    array.push("'");
-    array.push(",");
-    array.push("'");
-    array.push(pushNotification.Read);
-    array.push("'");
-    array.push(",");
-    array.push("'");
-    array.push(this.generateSqlToDate(pushNotification.Create));
-    array.push("'");
-    array.push(")");
-
-    return array.join('');
+    let sql = `
+      INSERT INTO pushNotification (Id, Type, Title, Message, Readed, CreateOn, Submitted) VALUES
+      (
+        '${pushNotification.Id}',
+        ${pushNotification.Type},
+        '${pushNotification.Title}',
+        '${pushNotification.Message}',
+        ${pushNotification.Readed?1:0},
+        '${this.generateSqlToDate(pushNotification.Create)}',
+        ${pushNotification.Submitted?1:0}
+      )
+      `
+    return sql;
   }
 
-  private generateSqlToDate(date: Date){
-      let year = date.getFullYear();
-      let month = date.getMonth();
-      let day = date.getDay();
-      let hour = date.getHours();
-      let minuts = date.getMinutes();
-      let seconds = date.getSeconds();
+  private generateSqlToDate(date: Date) {
+    let year = date.getFullYear();
+    let month = date.getMonth();
+    let day = date.getDate();
+    let hour = date.getHours();
+    let minuts = date.getMinutes();
+    let seconds = date.getSeconds();
 
-      return `${year}-${month}-${day} ${hour}:${minuts}:${seconds}`;
+    return `${year}-${month + 1}-${day} ${hour}:${minuts}:${seconds}`;
   }
 
   private getUpdateSql(pushNotification: PushNotification): string {
-    let array = [];
-    array.push("UPDATE pushNotification SET ");
-    array.push("Read=");
-    array.push("'");
-    array.push(pushNotification.Read);
-    array.push("'");
-    array.push(" WHERE ");
-    array.push("Id=");
-    array.push("'");
-    array.push(pushNotification.Id);
-    array.push("'");
-
-    return array.join('');
+    let sql = `
+      UPDATE pushNotification SET 
+      Readed=${pushNotification.Readed?1:0},
+      Submitted=${pushNotification.Submitted?1:0}
+       WHERE Id = '${pushNotification.Id}'
+      `
+    return sql;
   }
 
   public findById(id: string): Promise<Object> {
@@ -121,7 +115,7 @@ export class PushNotificationDao {
         location: "default"
       }).then((db) => {
         this.db = db;
-        this.db.executeSql('SELECT * FROM pushNotification', [])
+        this.db.executeSql('SELECT * FROM pushNotification ORDER BY CreateOn DESC', [])
           .then((data) => {
             callback(data);
           })
@@ -132,7 +126,7 @@ export class PushNotificationDao {
   }
 
   public findAll() {
-    return this.db.executeSql('SELECT * FROM pushNotification', []);
+    return this.db.executeSql('SELECT * FROM pushNotification ORDER BY CreateOn DESC', []);
   }
 
   private getSqlCreateDb(): string {
@@ -144,9 +138,10 @@ export class PushNotificationDao {
       ' Type INTEGER(11),',
       ' Title TEXT,',
       ' Message TEXT,',
-      ' READ INTEGER(1),',
-      ' Create DATE',
-      ') '
+      ' Readed BOOLEAN,',
+      ' CreateOn DATE,',
+      ' Submitted BOOLEAN',
+      ')'
     ].join("");
   }
 

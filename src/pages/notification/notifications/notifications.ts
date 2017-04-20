@@ -1,6 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 
-import { NavController, NavParams, ModalController, AlertController, Platform, Events } from 'ionic-angular';
+import { NavController, NavParams, AlertController, Platform, Events } from 'ionic-angular';
 
 import { NotificationFormModal } from './../form/notification-form.modal.component';
 import { NotificationModalComponent } from './../notification/notification-modal.component';
@@ -22,7 +22,6 @@ export class NotificationsPage implements OnInit {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    public modalCtrl: ModalController,
     private platform: Platform,
     public alertCtrl: AlertController,
     private dao: PushNotificationDao,
@@ -41,6 +40,10 @@ export class NotificationsPage implements OnInit {
 
       this.events.subscribe('notification:created', (user, time) => {
         console.log("new notification received");
+        this.listAll();
+      });
+      this.events.subscribe('notification:update', (user, time) => {
+        console.log("notifications update");
         this.listAll();
       });
     });
@@ -69,6 +72,7 @@ export class NotificationsPage implements OnInit {
       new PushNotificationBuilder()
         .id("$12")
         .message("esta é uma mensagem de teste mock")
+        .submitted(false)
         .read(false)
         .title("Mensagem read")
         .type(0)
@@ -80,6 +84,7 @@ export class NotificationsPage implements OnInit {
         .message("esta é uma mensagem de teste mock")
         .read(false)
         .title("Mensagem boolean")
+        .submitted(false)
         .type(1)
         .build()
     )
@@ -90,6 +95,7 @@ export class NotificationsPage implements OnInit {
         .read(true)
         .title("Mensagem boolean 2")
         .type(1)
+        .submitted(true)
         .build()
     )
     nots.push(
@@ -98,6 +104,7 @@ export class NotificationsPage implements OnInit {
         .message("esta é uma mensagem de teste mock")
         .read(false)
         .title("Mensagem read")
+        .submitted(false)
         .type(0)
         .build()
     )
@@ -123,12 +130,16 @@ export class NotificationsPage implements OnInit {
   }
 
   private createPush(obj): PushNotification {
+    console.log('OBJECT CREATED');
+    console.log(obj);
     let push = new PushNotification();
     push.Id = obj.Id;
     push.Type = obj.Type;
     push.Title = obj.Title;
     push.Message = obj.Message;
-    push.Read = obj.READ;
+    push.Readed = obj.Readed === 1 ? true:false;
+    push.Create = obj.CreateOn;
+    push.Submitted = obj.Submitted  === 1 ? true:false;
     return push;
 
   }
@@ -143,18 +154,16 @@ export class NotificationsPage implements OnInit {
   }
 
   openForm(notification) {
-    let modal = this.modalCtrl.create(NotificationFormModal);
-    modal.present();
+    this.navCtrl.push(NotificationFormModal);
   }
 
   openPageContentNotification(notification) {
     if (this.platform.is('android') || this.platform.is('ios')) {
       notification.Read = true;
-      this.dao.update(notification).then((data) => {
-        console.log(data);
+      this.dao.update(notification, (data)=>{
+         console.log(data);
         this.navCtrl.push(NotificationModalComponent, notification);
-      }, (error) => console.log(error))
-        .catch((error) => console.log(error));
+      })
     }
     else
       this.navCtrl.push(NotificationModalComponent, notification);

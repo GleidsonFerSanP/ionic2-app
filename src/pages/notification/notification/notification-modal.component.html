@@ -8,10 +8,6 @@
 </ion-header>
 
 <ion-content>
-    <ion-refresher (ionRefresh)="listNotifications($event)">
-        <ion-refresher-content pullingIcon="arrow-dropdown" pullingText="Puxe para atualizar" refreshingSpinner="circles" refreshingText="Atualizando...">
-        </ion-refresher-content>
-    </ion-refresher>
     <ion-card>
         <ion-card-header>
             {{notification.Title}}
@@ -25,8 +21,8 @@
                 </ion-row>
                 <ion-row>
                     <ion-col col-12 style="text-align: right;" *ngIf="notification.Type === 1">
-                        <button ion-button color="danger" round (click)="no()">Não</button>
-                        <button ion-button color="secondary" round (click)="yes()">Sim</button>
+                        <button [disabled]="notification.Submitted === true || notification.Submitted === 'true'" ion-button color="danger" round (click)="no()">Não</button>
+                        <button [disabled]="notification.Submitted === true || notification.Submitted === 'true'" ion-button color="secondary" round (click)="yes()">Sim</button>
                     </ion-col>
                 </ion-row>
             </ion-grid>

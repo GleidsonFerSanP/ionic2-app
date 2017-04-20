@@ -3,6 +3,7 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule, NavModule } from 'ionic-angular';
 
 import { HttpModule, Http, XHRBackend, RequestOptions } from '@angular/http';
+import { Device } from '@ionic-native/device';
 
 import { SQLite } from '@ionic-native/sqlite';
 
@@ -67,6 +68,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     NotificationService,
     Network,
     Diagnostic,
+    Device,
     StorageUtils,
     StatusBar,
     SplashScreen,

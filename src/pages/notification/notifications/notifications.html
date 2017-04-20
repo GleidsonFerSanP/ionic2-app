@@ -13,16 +13,20 @@
         </ion-refresher-content>
     </ion-refresher>
     <ion-list>
-        <button [ngClass]="notification.Read === 'false' || notification.Read === false ? 'item-list-new':''" ion-item (click)="openPageContentNotification(notification)" *ngFor="let notification of notifications">
-            <ion-avatar item-left>
-                <div class="avatar">
-                    <ion-icon *ngIf="notification.Type === 1" class="icon" md="md-help-circle" item-left></ion-icon>
-                    <ion-icon *ngIf="notification.Type === 0" class="icon" md="md-information-circle" item-left></ion-icon>
-                </div>
-            </ion-avatar>
-            <h2>{{notification.Title}}</h2>
-            <p>{{notification.Message}}</p>
-        </button>
+        <ion-item-sliding #item>
+            <ion-item [ngClass]="notification.Readed === 'false' || notification.Readed === false ? 'item-list-new':''" (click)="openPageContentNotification(notification)" *ngFor="let notification of notifications">
+                <ion-avatar item-left>
+                    <div class="avatar">
+                        <ion-icon *ngIf="notification.Type === 1" class="icon" md="md-help-circle" item-left></ion-icon>
+                        <ion-icon *ngIf="notification.Type === 0" class="icon" md="md-information-circle" item-left></ion-icon>
+                    </div>
+                </ion-avatar>
+                <h2>{{notification.Title}}</h2>
+                <p>{{notification.Message}}</p>
+            </ion-item>
+            <ion-item-options side="right">
+            </ion-item-options>
+        </ion-item-sliding>
     </ion-list>
 
 </ion-content>

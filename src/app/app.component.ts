@@ -102,10 +102,10 @@ export class MyApp {
   }
 
   private savePushNotificate(push: PushNotification) {
-    console.log(push);
 
-    push.Read = false;
     push.Create = new Date();
+    push.Readed = false;
+    push.Submitted = false;
 
     this.pushNotificationDAO.save(push)
       .then((data) => {
@@ -120,6 +120,7 @@ export class MyApp {
     this.unregisterPushNotifications();
     window.localStorage.setItem('SessionId', '');
     window.localStorage.setItem('User', '');
+    window.localStorage.setItem('cidade', '');
     this.nav.setRoot(LoginPage);
   }
 

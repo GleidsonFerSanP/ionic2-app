@@ -7,7 +7,6 @@ import { Toast } from '@ionic-native/toast';
 
 import { Usuario } from './../model/usuario';
 import { Device } from './../model/device';
-import { CentiResponseObject } from './../model/centi-response-object';
 
 import { LoadingController } from 'ionic-angular';
 

@@ -21,8 +21,12 @@ export class PushNotificationBuilder{
         this.push.Type = type;
         return this;
     }
-    public read(read: boolean): PushNotificationBuilder{
-        this.push.Read = read;
+    public read(readed: boolean): PushNotificationBuilder{
+        this.push.Readed = readed;
+        return this;
+    }
+    public submitted(submitted: boolean): PushNotificationBuilder{
+        this.push.Submitted = submitted;
         return this;
     }
     public message(message: string): PushNotificationBuilder{

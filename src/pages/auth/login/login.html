@@ -3,14 +3,21 @@
         <div> <img src="assets/logo/logo-centi.png" alt=""> </div>
     </div>
     <form [formGroup]="loginForm">
-        <ion-item>
+        <ion-item class="item-list-input-content">
+            <ion-label stacked>Cidade</ion-label>
+            <ion-input type="text" formControlName="cidade" [(ngModel)]="cidade"></ion-input>
+        </ion-item>
+        <ion-item *ngIf="!loginForm.controls.cidade.valid  && (loginForm.controls.cidade.dirty || submitAttempt)">
+            <p style="color: red">Por favor preencha a cidade</p>
+        </ion-item>
+        <ion-item class="item-list-input-content">
             <ion-label stacked>Usuário</ion-label>
             <ion-input type="text" formControlName="user" [(ngModel)]="usuario.User"></ion-input>
         </ion-item>
         <ion-item *ngIf="!loginForm.controls.user.valid  && (loginForm.controls.user.dirty || submitAttempt)">
             <p style="color: red">Por favor preencha seu usuário</p>
         </ion-item>
-        <ion-item>
+        <ion-item class="item-list-input-content">
             <ion-label stacked>Senha</ion-label>
             <ion-input type="password" formControlName="password" [(ngModel)]="usuario.Pass"></ion-input>
         </ion-item>

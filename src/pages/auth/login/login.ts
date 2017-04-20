@@ -8,6 +8,7 @@ import { LoadingController } from 'ionic-angular';
 import { NotificationsPage } from './../../notification/notifications/notifications';
 
 import { AuthService } from './../../../providers/auth-service';
+import { environment } from './../../../providers/environment';
 
 import { Usuario } from './../../../model/usuario';
 import { Device } from './../../../model/device';
@@ -23,6 +24,7 @@ import { LostPasswordModal } from '../lost-password/lost-password-modal.componen
 export class LoginPage {
 
   loginForm: FormGroup;
+  cidade: string;
   usuario: Usuario = new Usuario();
   submitAttempt: boolean = false;
 
@@ -36,24 +38,33 @@ export class LoginPage {
     public loading: LoadingController) {
 
     this.loginForm = this.formBuilder.group({
+      cidade: ['', Validators.required],
       user: ['', Validators.required],
       password: ['', Validators.compose([Validators.required])]
     });
-
   }
+
+  // setCity() {
+  //   console.log(this.cidade);
+  //   window.localStorage.setItem("cidade", this.cidade);
+  // }
 
   login() {
 
     if (this.loginForm.invalid) {
-      this.message('Por favor preenha seu Usuário e sua senha');
+      this.message('Por favor preenha a cidade seu usuário e sua senha');
       return;
     }
+    environment.cidade = this.cidade;
+    window.localStorage.setItem("cidade", this.cidade);
 
+    console.log(environment);
+    
     this.submitAttempt = true;
-      this.auth.login(this.usuario, (data) => {
-         console.log(data);
-         this.registerDeviceOnPushNotification(data.Value);
-      })
+    this.auth.login(this.usuario, (data) => {
+      console.log(data);
+      this.registerDeviceOnPushNotification(data.Value);
+    })
 
   }
 
@@ -79,9 +90,9 @@ export class LoginPage {
       return;
     }
 
-    this.auth.registerDevice(device, (data: CentiResponseObject)=>{
-        if (data.Success)
-          this.navCtrl.setRoot(NotificationsPage);
+    this.auth.registerDevice(device, (data: CentiResponseObject) => {
+      if (data.Success)
+        this.navCtrl.setRoot(NotificationsPage);
 
     })
   }
