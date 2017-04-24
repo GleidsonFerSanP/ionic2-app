@@ -55,7 +55,6 @@ export class LoginPage {
       this.message('Por favor preenha a cidade seu usuário e sua senha');
       return;
     }
-    environment.cidade = this.cidade;
     window.localStorage.setItem("cidade", this.cidade);
 
     console.log(environment);
@@ -87,13 +86,13 @@ export class LoginPage {
 
   private sendRegister(device: Device) {
     if (!device.DeviceId) {
+      this.navCtrl.setRoot(NotificationsPage);
       return;
     }
 
     this.auth.registerDevice(device, (data: CentiResponseObject) => {
       if (data.Success)
         this.navCtrl.setRoot(NotificationsPage);
-
     })
   }
 

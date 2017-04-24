@@ -7,15 +7,10 @@ import { NavParams, AlertController, Platform, Events } from 'ionic-angular';
 import { Toast } from '@ionic-native/toast';
 
 import { Geolocation } from '@ionic-native/geolocation';
-
 import { PushNotification } from './../../../model/push-notification';
 import { PushNotificationBuilder } from './../../../model/push-notification.builder';
 import { PushConfirm } from './../../../model/push-confirm';
-
 import { NotificationService } from './../../../providers/notification-service';
-
-import { PushNotificationDao } from './../../../providers/push-notification-dao';
-
 import { Page } from './../../page';
 
 @Component({
@@ -34,7 +29,6 @@ export class NotificationModalComponent extends Page {
     private geolocation: Geolocation,
     private diagnostic: Diagnostic,
     public platform: Platform,
-    private dao: PushNotificationDao,
     public toast: Toast,
     private device: Device) {
 
@@ -46,17 +40,15 @@ export class NotificationModalComponent extends Page {
   loadNotification() {
     let id = this.navParams.get('Id');
     let type = this.navParams.get('Type');
-    let read = this.navParams.get('Read');
+    let status = this.navParams.get('Status');
     let title = this.navParams.get('Title');
     let message = this.navParams.get('Message');
-    let submitted = this.navParams.get('Submitted');
 
     this.notification = new PushNotificationBuilder()
       .id(id)
       .title(title)
       .type(type)
-      .read(read)
-      .submitted(submitted)
+      .status(status)
       .message(message)
       .build();
   }
@@ -85,11 +77,11 @@ export class NotificationModalComponent extends Page {
           console.log(data);
           if (data.Success) {
 
-            this.notification.Submitted = true;
-            this.dao.update(this.notification, ()=>{
-               console.log(data);
-              this.events.publish('notification:update', {}, Date.now());
-            })
+            this.notification.Status = 3;
+            // this.dao.update(this.notification, ()=>{
+            //    console.log(data);
+            //   this.events.publish('notification:update', {}, Date.now());
+            // })
 
           }
         })

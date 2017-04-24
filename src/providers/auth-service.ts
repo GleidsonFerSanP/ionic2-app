@@ -56,15 +56,4 @@ export class AuthService extends Service {
             this.processResult(data, callback);
         });
     }
-
-    private processResult(data, callback) {
-        let obj = data;
-        console.log(data);
-        if (obj.Success) {
-            callback(data);
-            return;
-        }
-
-        this.generateMessages(obj);
-    }
 }

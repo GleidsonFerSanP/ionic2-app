@@ -1,9 +1,7 @@
 import { NavController, Platform, App } from 'ionic-angular';
 import { Toast } from '@ionic-native/toast';
 import { Http } from "@angular/http";
-
 import { LoadingController } from 'ionic-angular';
-
 import { CentiResponseObject } from './../model/centi-response-object';
 
 export abstract class Service {
@@ -13,7 +11,7 @@ export abstract class Service {
         protected toast: Toast,
         protected app: App,
         protected platform: Platform,
-        protected loading: LoadingController) {}
+        protected loading: LoadingController) { }
 
     private load() {
         this.loader = this.loading.create({
@@ -52,8 +50,11 @@ export abstract class Service {
     }
 
     protected generateMessages(objResponse: CentiResponseObject) {
+        if (!objResponse.Message)
+            return;
         let message = objResponse.Message.join("\n");
         this.message(message);
+        this.loader.dismiss();
     }
 
     private requestErrors(error) {
@@ -79,14 +80,23 @@ export abstract class Service {
     }
 
     protected message(text: string) {
-
         if (this.platform.is('android') || this.platform.is('ios')) {
             this.toast.show(text, '2000', 'center')
                 .subscribe(
                 toast => { console.log(toast); });
-
         } else {
             alert(text);
         }
+    }
+
+    protected processResult(data, callback) {
+        let obj = data;
+        console.log(data);
+        if (obj.Success) {
+            callback(data);
+            return;
+        }
+
+        this.generateMessages(obj);
     }
 }

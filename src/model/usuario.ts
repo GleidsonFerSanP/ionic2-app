@@ -1,7 +1,6 @@
-export class Usuario{
-    nome: string = "";
+export class Usuario {
     User: string = "";
     Pass: string = "";
-    device: any;
-
+    Device: any;
+    Cidade: string;
 }

@@ -3,7 +3,6 @@ export class PushNotification{
     Type: number;
     Title: string;
     Message: string;
-    Readed: boolean = false;
-    Create: Date;
-    Submitted: boolean = false;
+    DateTime: Date;
+    Status: number;
 }

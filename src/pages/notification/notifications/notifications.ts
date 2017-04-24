@@ -1,14 +1,10 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-
-import { NavController, NavParams, AlertController, Platform, Events } from 'ionic-angular';
-
+import { NavController, NavParams, AlertController, Platform, Events, ItemSliding } from 'ionic-angular';
 import { NotificationFormModal } from './../form/notification-form.modal.component';
 import { NotificationModalComponent } from './../notification/notification-modal.component';
-
 import { PushNotification } from './../../../model/push-notification';
 import { PushNotificationBuilder } from './../../../model/push-notification.builder';
-
-import { PushNotificationDao } from './../../../providers/push-notification-dao';
+import { NotificationService } from './../../../providers/notification-service';
 
 @Component({
   selector: 'page-notificacoes',
@@ -24,7 +20,7 @@ export class NotificationsPage implements OnInit {
     public navParams: NavParams,
     private platform: Platform,
     public alertCtrl: AlertController,
-    private dao: PushNotificationDao,
+    private notificationService: NotificationService,
     public events: Events,
     private ngZone: NgZone) {
   }
@@ -32,10 +28,7 @@ export class NotificationsPage implements OnInit {
   ngOnInit() {
     this.ngZone.run(() => {
       this.platform.ready().then(() => {
-        if (this.platform.is('android') || this.platform.is('ios'))
-          this.listAllOnInit();
-        else
-          this.listaMock();
+        this.listAll();
       })
 
       this.events.subscribe('notification:created', (user, time) => {
@@ -49,31 +42,12 @@ export class NotificationsPage implements OnInit {
     });
   }
 
-  private listAllOnInit() {
-    this.notifications = [];
-    this.dao.findAllOnInit((data) => {
-
-      console.log(data);
-
-      if (data.rows.length > 0) {
-        for (var i = 0; i < data.rows.length; i++) {
-          let push = this.createPush(data.rows.item(i));
-          this.notifications.push(push);
-        }
-      }
-
-      console.log(this.notifications);
-    })
-  }
-
-  private listaMock() {
+  private listMock() {
     let nots: Array<PushNotification> = [];
     nots.push(
       new PushNotificationBuilder()
         .id("$12")
         .message("esta é uma mensagem de teste mock")
-        .submitted(false)
-        .read(false)
         .title("Mensagem read")
         .type(0)
         .build()
@@ -82,9 +56,7 @@ export class NotificationsPage implements OnInit {
       new PushNotificationBuilder()
         .id("g5J9$Z58teX")
         .message("esta é uma mensagem de teste mock")
-        .read(false)
         .title("Mensagem boolean")
-        .submitted(false)
         .type(1)
         .build()
     )
@@ -92,19 +64,16 @@ export class NotificationsPage implements OnInit {
       new PushNotificationBuilder()
         .id("$15")
         .message("esta é uma mensagem de teste mock fwetwertwetsdslapnouibsoipduanidjsfn piandsfi ndsiupnfuisdnifun sinfpidsngpuisn")
-        .read(true)
         .title("Mensagem boolean 2")
         .type(1)
-        .submitted(true)
         .build()
     )
     nots.push(
       new PushNotificationBuilder()
         .id("$12")
         .message("esta é uma mensagem de teste mock")
-        .read(false)
         .title("Mensagem read")
-        .submitted(false)
+        .status(1)
         .type(0)
         .build()
     )
@@ -115,17 +84,10 @@ export class NotificationsPage implements OnInit {
   private listAll() {
     this.ngZone.run(() => {
       this.notifications = [];
-      this.dao.findAll()
-        .then((data) => {
-          if (data.rows.length > 0) {
-            for (var i = 0; i < data.rows.length; i++) {
-              let push = this.createPush(data.rows.item(i))
-              this.notifications.push(push);
-            }
-
-            console.log(this.notifications);
-          }
-        })
+      this.listMock();
+      // this.notificationService.findAll((data)=>{
+      //     this.listNotifications = data;
+      // });
     });
   }
 
@@ -137,9 +99,6 @@ export class NotificationsPage implements OnInit {
     push.Type = obj.Type;
     push.Title = obj.Title;
     push.Message = obj.Message;
-    push.Readed = obj.Readed === 1 ? true:false;
-    push.Create = obj.CreateOn;
-    push.Submitted = obj.Submitted  === 1 ? true:false;
     return push;
 
   }
@@ -148,7 +107,7 @@ export class NotificationsPage implements OnInit {
     if (this.platform.is('android') || this.platform.is('ios'))
       this.listAll();
     else
-      this.listaMock();
+      this.listMock();
 
     refresher.complete();
   }
@@ -157,11 +116,33 @@ export class NotificationsPage implements OnInit {
     this.navCtrl.push(NotificationFormModal);
   }
 
+  delete(slidingItem: ItemSliding, notification: PushNotification) {
+    this.ngZone.run(() => {
+      let percent = slidingItem.getOpenAmount();
+      let submitting = false;
+      console.log(percent);
+      if (percent > 100) {
+        console.log(notification);
+        let index = this.notifications.indexOf(notification);
+        notification.Status = 2;
+
+        if (!submitting) {
+          submitting = true;
+          this.notificationService.update(notification, (response) => {
+            console.log(response);
+            submitting = false;
+            this.notifications.splice(index, 1);
+          })
+        }
+      }
+    });
+  }
+
   openPageContentNotification(notification) {
     if (this.platform.is('android') || this.platform.is('ios')) {
-      notification.Read = true;
-      this.dao.update(notification, (data)=>{
-         console.log(data);
+      notification.Status = 1;
+      this.notificationService.update(notification, (response) => {
+        console.log(response);
         this.navCtrl.push(NotificationModalComponent, notification);
       })
     }

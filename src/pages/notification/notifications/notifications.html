@@ -13,8 +13,8 @@
         </ion-refresher-content>
     </ion-refresher>
     <ion-list>
-        <ion-item-sliding #item>
-            <ion-item [ngClass]="notification.Readed === 'false' || notification.Readed === false ? 'item-list-new':''" (click)="openPageContentNotification(notification)" *ngFor="let notification of notifications">
+        <ion-item-sliding #slidingItem (ionDrag)="delete($event, notification)" *ngFor="let notification of notifications">
+            <ion-item [ngClass]="notification.Readed === 'false' || notification.Readed === false ? 'item-list-new':''" (click)="openPageContentNotification(notification)">
                 <ion-avatar item-left>
                     <div class="avatar">
                         <ion-icon *ngIf="notification.Type === 1" class="icon" md="md-help-circle" item-left></ion-icon>
