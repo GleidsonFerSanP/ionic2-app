@@ -21,8 +21,8 @@
                 </ion-row>
                 <ion-row>
                     <ion-col col-12 style="text-align: right;" *ngIf="notification.Type === 1">
-                        <button [disabled]="notification.Submitted === true || notification.Submitted === 'true'" ion-button color="danger" round (click)="no()">Não</button>
-                        <button [disabled]="notification.Submitted === true || notification.Submitted === 'true'" ion-button color="secondary" round (click)="yes()">Sim</button>
+                        <button [disabled]="notification.Authorized > 0" ion-button color="danger" round (click)="no()">Não</button>
+                        <button [disabled]="notification.Authorized > 0" ion-button color="secondary" round (click)="yes()">Sim</button>
                     </ion-col>
                 </ion-row>
             </ion-grid>

@@ -1,28 +1,38 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { NavController, NavParams, AlertController, Platform, Events, ItemSliding } from 'ionic-angular';
-import { NotificationFormModal } from './../form/notification-form.modal.component';
 import { NotificationModalComponent } from './../notification/notification-modal.component';
 import { PushNotification } from './../../../model/push-notification';
-import { PushNotificationBuilder } from './../../../model/push-notification.builder';
 import { NotificationService } from './../../../providers/notification-service';
+import { Geolocation } from '@ionic-native/geolocation';
+import { Toast } from '@ionic-native/toast';
+import { Device } from '@ionic-native/device';
+import { PushConfirm } from './../../../model/push-confirm';
+import { Diagnostic } from '@ionic-native/diagnostic';
+import { Page } from './../../page';
 
 @Component({
   selector: 'page-notificacoes',
   templateUrl: 'notifications.html'
 })
-export class NotificationsPage implements OnInit {
+export class NotificationsPage extends Page implements OnInit {
 
   readyContentPage = NotificationModalComponent;
   notifications: Array<PushNotification> = [];
+  submited = false;
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private platform: Platform,
+    public platform: Platform,
     public alertCtrl: AlertController,
+    private geolocation: Geolocation,
     private notificationService: NotificationService,
+    private diagnostic: Diagnostic,
+    private device: Device,
     public events: Events,
+    public toast: Toast,
     private ngZone: NgZone) {
+    super(toast, platform);
   }
 
   ngOnInit() {
@@ -42,111 +52,86 @@ export class NotificationsPage implements OnInit {
     });
   }
 
-  private listMock() {
-    let nots: Array<PushNotification> = [];
-    nots.push(
-      new PushNotificationBuilder()
-        .id("$12")
-        .message("esta é uma mensagem de teste mock")
-        .title("Mensagem read")
-        .type(0)
-        .build()
-    )
-    nots.push(
-      new PushNotificationBuilder()
-        .id("g5J9$Z58teX")
-        .message("esta é uma mensagem de teste mock")
-        .title("Mensagem boolean")
-        .type(1)
-        .build()
-    )
-    nots.push(
-      new PushNotificationBuilder()
-        .id("$15")
-        .message("esta é uma mensagem de teste mock fwetwertwetsdslapnouibsoipduanidjsfn piandsfi ndsiupnfuisdnifun sinfpidsngpuisn")
-        .title("Mensagem boolean 2")
-        .type(1)
-        .build()
-    )
-    nots.push(
-      new PushNotificationBuilder()
-        .id("$12")
-        .message("esta é uma mensagem de teste mock")
-        .title("Mensagem read")
-        .status(1)
-        .type(0)
-        .build()
-    )
-
-    this.notifications = nots;
-  }
-
   private listAll() {
-    this.ngZone.run(() => {
-      this.notifications = [];
-      this.listMock();
-      // this.notificationService.findAll((data)=>{
-      //     this.listNotifications = data;
-      // });
+    //this.listMock();
+    this.notificationService.findAll((data) => {
+      console.log(data);
+      this.ngZone.run(() => {
+        this.notifications = [];
+        this.notifications = data.Pushs;
+      });
     });
   }
 
-  private createPush(obj): PushNotification {
-    console.log('OBJECT CREATED');
-    console.log(obj);
-    let push = new PushNotification();
-    push.Id = obj.Id;
-    push.Type = obj.Type;
-    push.Title = obj.Title;
-    push.Message = obj.Message;
-    return push;
-
-  }
-
   listNotifications(refresher) {
-    if (this.platform.is('android') || this.platform.is('ios'))
-      this.listAll();
-    else
-      this.listMock();
-
+    this.listAll();
     refresher.complete();
-  }
-
-  openForm(notification) {
-    this.navCtrl.push(NotificationFormModal);
   }
 
   delete(slidingItem: ItemSliding, notification: PushNotification) {
     this.ngZone.run(() => {
       let percent = slidingItem.getOpenAmount();
-      let submitting = false;
-      console.log(percent);
       if (percent > 100) {
-        console.log(notification);
-        let index = this.notifications.indexOf(notification);
         notification.Status = 2;
+        let index = this.notifications.indexOf(notification);
+        this.updateNotification(notification, (response) => {
+          this.notifications.splice(index, 1);
+        });
 
-        if (!submitting) {
-          submitting = true;
-          this.notificationService.update(notification, (response) => {
-            console.log(response);
-            submitting = false;
-            this.notifications.splice(index, 1);
-          })
-        }
       }
     });
   }
 
-  openPageContentNotification(notification) {
+  private updateNotification(notification: PushNotification, callback) {
     if (this.platform.is('android') || this.platform.is('ios')) {
-      notification.Status = 1;
-      this.notificationService.update(notification, (response) => {
-        console.log(response);
-        this.navCtrl.push(NotificationModalComponent, notification);
-      })
+
+      this.diagnostic.isLocationEnabled().then((enable) => {
+        if (enable === false) {
+          this.message("Por favor ative o GPS");
+          return;
+        }
+        this.captureLocationAndSubmit(notification, callback);
+      }, (error) => console.log(error));
+    } else {
+      this.captureLocationAndSubmit(notification, callback);
     }
-    else
+  }
+
+  private captureLocationAndSubmit(notification: PushNotification, callback) {
+    this.geolocation.getCurrentPosition().then((location) => {
+      let confirmNotification = new PushConfirm(
+        notification.Authorized,
+        notification.Id,
+        location.coords.latitude,
+        location.coords.longitude,
+        window.localStorage.getItem("User"),
+        this.device.uuid === null ? 'dev' : this.device.uuid,
+        notification.Status,
+        `${this.device.manufacturer}-${this.device.model}`);
+
+      if (!this.submited) {
+        this.submited = true;
+        this.notificationService.update(confirmNotification, (response) => {
+          console.log(response);
+          setTimeout(function () {
+          }, 1000);
+          this.submited = false;
+          callback(response);
+        })
+      }
+    }, (error) => console.log(error));
+  }
+
+  openPageContentNotification(notification) {
+    console.log(notification);
+
+    if (notification.Status > 0) {
       this.navCtrl.push(NotificationModalComponent, notification);
+      return;
+    }
+    notification.Status = 1;
+    this.updateNotification(notification, (response) => {
+      this.navCtrl.push(NotificationModalComponent, notification);
+    })
   }
 }

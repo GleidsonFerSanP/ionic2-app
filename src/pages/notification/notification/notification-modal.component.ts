@@ -43,53 +43,65 @@ export class NotificationModalComponent extends Page {
     let status = this.navParams.get('Status');
     let title = this.navParams.get('Title');
     let message = this.navParams.get('Message');
+    let authorized = this.navParams.get('Authorized');
 
     this.notification = new PushNotificationBuilder()
       .id(id)
       .title(title)
+      .authorized(authorized)
       .type(type)
       .status(status)
       .message(message)
       .build();
   }
 
-  sendConfirmNotification(option: boolean) {
+  sendConfirmNotification() {
+    if (this.platform.is('android') || this.platform.is('ios')) {
+      this.diagnostic.isLocationEnabled().then((enable) => {
 
-    this.diagnostic.isLocationEnabled().then((enable) => {
+        if (enable === false) {
+          this.message("Por favor ative o GPS");
+          return;
+        }
 
-      if (enable === false) {
-        this.message("Por favor ative o GPS");
-        return;
-      }
+        this.captureLocationAndSubmit((data) => {
 
-      this.geolocation.getCurrentPosition().then((location) => {
-        console.log(location);
-        let confirmNotification = new PushConfirm(
-          option,
-          this.notification.Id,
-          location.coords.latitude,
-          location.coords.longitude,
-          window.localStorage.getItem("User"),
-          this.device.uuid,
-          `${this.device.manufacturer}-${this.device.model}`);
-
-        this.notifService.submitTypeBoolean(confirmNotification, (data) => {
-          console.log(data);
-          if (data.Success) {
-
-            this.notification.Status = 3;
-            // this.dao.update(this.notification, ()=>{
-            //    console.log(data);
-            //   this.events.publish('notification:update', {}, Date.now());
-            // })
-
-          }
         })
 
-      }, (error) => { console.log(error) });
+      }, (error) => console.log(error));
 
+    } else {
+      this.captureLocationAndSubmit((response) => {
+
+      });
+    }
+
+  }
+
+  private captureLocationAndSubmit(callback) {
+    this.geolocation.getCurrentPosition().then((location) => {
+      let confirmNotification = new PushConfirm(
+        this.notification.Authorized,
+        this.notification.Id,
+        location.coords.latitude,
+        location.coords.longitude,
+        window.localStorage.getItem("User"),
+        this.device.uuid === null ? 'dev' : this.device.uuid,
+        this.notification.Status,
+        `${this.device.manufacturer}-${this.device.model}`);
+      let submitting = false;
+
+      if (!submitting) {
+        submitting = true;
+        this.notifService.update(confirmNotification, (response) => {
+          console.log(response);
+          setTimeout(function () {
+            submitting = false;
+          }, 1000);
+          callback(response);
+        })
+      }
     }, (error) => console.log(error));
-
   }
 
   yes() {
@@ -107,7 +119,8 @@ export class NotificationModalComponent extends Page {
           text: 'Sim',
           handler: () => {
             console.log('Agree clicked');
-            this.sendConfirmNotification(true);
+            this.notification.Authorized = 2;
+            this.sendConfirmNotification();
           }
         }
       ]
@@ -129,7 +142,8 @@ export class NotificationModalComponent extends Page {
           text: 'Sim',
           handler: () => {
             console.log('Agree clicked');
-            this.sendConfirmNotification(false);
+            this.notification.Authorized = 1;
+            this.sendConfirmNotification();
           }
         }
       ]

@@ -2,7 +2,6 @@ import { Injectable } from "@angular/core";
 import { ConnectionBackend, RequestOptions, Request, RequestOptionsArgs, Response, Http, Headers } from "@angular/http";
 import { Observable } from "rxjs/Rx";
 import { environment } from "./environment";
-import { LoginPage } from './../pages/auth/login/login';
 
 @Injectable()
 export class InterceptedHttp extends Http {
@@ -39,7 +38,8 @@ export class InterceptedHttp extends Http {
 
   private updateUrl(req: string) {
     let cidade = window.localStorage.getItem("cidade");
-    return environment.origin + cidade + environment.path + req;
+    //return environment.origin + cidade + environment.path + req;
+    return 'https://centi-ggs/centi/wcf/service/erpservice.svc/rest'+req;
   }
 
   private getRequestOptionArgs(options?: RequestOptionsArgs): RequestOptionsArgs {

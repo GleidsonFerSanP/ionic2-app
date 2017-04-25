@@ -25,6 +25,10 @@ export class PushNotificationBuilder{
         this.push.Status = status;
         return this;
     }
+    public authorized(aut: number): PushNotificationBuilder{
+        this.push.Authorized = aut;
+        return this;
+    }
     public message(message: string): PushNotificationBuilder{
         this.push.Message = message;
         return this;

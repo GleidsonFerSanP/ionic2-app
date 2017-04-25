@@ -30,19 +30,4 @@ export class NotificationService extends Service {
             this.processResult(data, callback);
         });
     }
-
-    public submitTypeBoolean(pushConfirm: PushConfirm, callbackSucess) {
-        console.log(pushConfirm);
-        this.post("/pshconfirm", pushConfirm, (data) => {
-            let obj = data;
-            console.log(data);
-            if (obj.Success) {
-                callbackSucess(obj);
-                return;
-            }
-
-            this.generateMessages(obj);
-        })
-    }
-
 }

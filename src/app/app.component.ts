@@ -78,6 +78,7 @@ export class MyApp {
 
     pushObject.on('notification').subscribe((data: any) => {
       console.log('message', data);
+      this.events.publish('notification:created', {}, Date.now());
       if (data.additionalData.foreground) {
         console.log('message', data);
       } else {

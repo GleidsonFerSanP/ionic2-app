@@ -91,12 +91,12 @@ export abstract class Service {
 
     protected processResult(data, callback) {
         let obj = data;
-        console.log(data);
         if (obj.Success) {
             callback(data);
             return;
         }
 
         this.generateMessages(obj);
+
     }
 }

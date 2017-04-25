@@ -14,7 +14,7 @@
     </ion-refresher>
     <ion-list>
         <ion-item-sliding #slidingItem (ionDrag)="delete($event, notification)" *ngFor="let notification of notifications">
-            <ion-item [ngClass]="notification.Readed === 'false' || notification.Readed === false ? 'item-list-new':''" (click)="openPageContentNotification(notification)">
+            <ion-item [ngClass]="notification.Status === 0 ? 'item-list-new':''" (click)="openPageContentNotification(notification)">
                 <ion-avatar item-left>
                     <div class="avatar">
                         <ion-icon *ngIf="notification.Type === 1" class="icon" md="md-help-circle" item-left></ion-icon>
@@ -22,6 +22,7 @@
                     </div>
                 </ion-avatar>
                 <h2>{{notification.Title}}</h2>
+                <p>{{notification.DateTime}}</p>
                 <p>{{notification.Message}}</p>
             </ion-item>
             <ion-item-options side="right">
